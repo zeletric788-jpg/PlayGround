@@ -1,0 +1,52 @@
+const PARTS = [
+  { key:'woofer', title:'01 · GRAVE', short:'Grave', options:[
+    {name:'Mini 4″',price:32,stats:[28,48,32],dots:1},
+    {name:'Clássico 6″',price:54,stats:[55,48,54],dots:2},
+    {name:'Pulso 8″',price:82,stats:[83,42,76],dots:3}
+  ]},
+  { key:'tweeter', title:'02 · AGUDO', short:'Agudo', options:[
+    {name:'Domínio',price:28,stats:[22,47,25],dots:1},
+    {name:'Cúpula seda',price:48,stats:[25,72,42],dots:2},
+    {name:'Titânio pro',price:74,stats:[24,92,65],dots:3}
+  ]},
+  { key:'cabinet', title:'03 · GABINETE', short:'Gabinete', options:[
+    {name:'MDF básico',price:35,stats:[37,40,36],dots:1,color:'#8b684b'},
+    {name:'Pinus selado',price:55,stats:[52,57,51],dots:2,color:'#b27a4d'},
+    {name:'Freijó maciço',price:88,stats:[74,73,71],dots:3,color:'#536354'}
+  ]},
+  { key:'crossover', title:'04 · FILTRO', short:'Filtro', options:[
+    {name:'Direto ao ponto',price:24,stats:[35,37,35],dots:1},
+    {name:'Duas vias',price:43,stats:[53,67,53],dots:2},
+    {name:'Fase perfeita',price:68,stats:[70,86,69],dots:3}
+  ]}
+];
+const ORDERS = [
+  {name:'Dona Lúcia',avatar:'✿',profile:'Bossa na varanda',quote:'Quero ouvir João Gilberto na varanda. Sem gritaria, só aquele som macio e bonito.',budget:270,target:[46,78,43],weights:[1,1.5,.7]},
+  {name:'DJ Nando',avatar:'✹',profile:'Grave de pista',quote:'Sábado tem festa! Quero sentir o tum-tum no peito, mas sem o som virar uma bagunça.',budget:335,target:[87,54,79],weights:[1.5,.75,1.1]},
+  {name:'Bia & Caio',avatar:'♡',profile:'Som pra todo dia',quote:'Uma caixa pra nossa sala nova. A gente ouve de tudo e não quer gastar uma fortuna.',budget:260,target:[58,66,54],weights:[1,1,1]},
+  {name:'Seu Osvaldo',avatar:'✳',profile:'Rádio de oficina',quote:'Notícia, futebol e samba. Voz clara é o mais importante — grave é bom, mas não precisa tremer a chave inglesa.',budget:235,target:[42,84,48],weights:[.7,1.6,.7]},
+  {name:'Lia',avatar:'☼',profile:'Som de viagem',quote:'Vou levar a caixa pro sítio. Tem que tocar alto ao ar livre e aguentar a playlist inteira!',budget:310,target:[68,58,87],weights:[1,1,1.3]}
+];
+const $ = s => document.querySelector(s);
+const clamp = (n,min,max) => Math.max(min,Math.min(max,n));
+let state = {day:1,cash:500,rep:0,jobs:0,order:0,picks:{woofer:1,tweeter:1,cabinet:0,crossover:1},muted:false};
+let customOrder = null;
+let toastTimer;
+try { const saved=JSON.parse(localStorage.getItem('som-de-verdade-save')); if(saved && saved.version===1){state={...state,...saved.state};} } catch {}
+const orderNow=()=>customOrder||ORDERS[(state.order)%ORDERS.length];
+const chosen=key=>PARTS.find(p=>p.key===key).options[state.picks[key]];
+function stats(){return [0,1,2].map(i=>Math.round(PARTS.reduce((sum,p)=>sum+chosen(p.key).stats[i],0)/PARTS.length));}
+function partCost(){return PARTS.reduce((sum,p)=>sum+chosen(p.key).price,0);}
+function save(){try{localStorage.setItem('som-de-verdade-save',JSON.stringify({version:1,state}));}catch{}}
+function showToast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2100);}
+function renderParts(){const root=$('#part-groups');root.innerHTML='';PARTS.forEach(group=>{const box=document.createElement('div');box.className='part-group';box.innerHTML=`<div class="part-group-head"><b>${group.title}</b><span>ESCOLHA 1</span></div><div class="part-options">${group.options.map((o,i)=>`<button class="part-option ${state.picks[group.key]===i?'selected':''}" data-key="${group.key}" data-index="${i}" aria-pressed="${state.picks[group.key]===i}"><b>${o.name}</b><small>R$ ${o.price}</small><span class="part-dots">${[0,1,2].map(n=>`<i class="${n<o.dots?'on':''}"></i>`).join('')}</span></button>`).join('')}</div>`;root.appendChild(box);});root.querySelectorAll('.part-option').forEach(button=>button.addEventListener('click',()=>{state.picks[button.dataset.key]=Number(button.dataset.index);save();render();}));}
+function renderTargets(order){const names=['GRAVE','CLAREZA','POTÊNCIA'];$('#target-bars').innerHTML=order.target.map((v,i)=>`<div class="target-item"><span>${names[i]}</span><div class="target-track"><div class="target-fill" style="width:${v}%"></div></div>${v}</div>`).join('');}
+function renderSpecs(order){const names=['Grave','Clareza','Potência'],values=stats();$('#spec-list').innerHTML=values.map((v,i)=>`<div class="spec-row"><span>${names[i]}</span><div class="spec-track"><div class="spec-current" style="width:${v}%"></div><i class="spec-target" style="left:${order.target[i]}%"></i></div><b>${v}</b></div>`).join('');}
+function render(){const order=orderNow();$('#day-label').textContent=`DIA ${String(state.day).padStart(2,'0')}`;$('#cash-value').textContent=`R$ ${state.cash}`;$('#rep-value').textContent=state.rep;$('#jobs-value').innerHTML=`${state.jobs}<span class="stat-muted"> / ∞</span>`;$('#customer-title').textContent=`Encomenda de ${order.name}`;$('#customer-name').textContent=order.name;$('#customer-profile').textContent=order.profile;$('#customer-quote').textContent=order.quote;$('#customer-budget').textContent=`R$ ${order.budget}`;$('#customer-avatar').textContent=order.avatar;$('#prototype-number').textContent=String(state.jobs+1).padStart(3,'0');renderTargets(order);renderParts();$('#parts-cost').textContent=`R$ ${partCost()}`;renderSpecs(order);const enough=partCost()<=state.cash;$('#deliver-button').disabled=!enough;$('#build-hint').textContent=enough?`Orçamento do cliente: R$ ${order.budget} · capriche no encaixe!`:`Faltam R$ ${partCost()-state.cash} para comprar essas peças.`;$('#speaker-box').style.background=chosen('cabinet').color;$('#sound-toggle').title=state.muted?'Som desligado':'Som ligado';}
+function startGame(){ $('#intro-screen').classList.add('hidden');$('#game-screen').classList.remove('hidden');render();window.scrollTo(0,0); }
+function grade(){const order=orderNow(),values=stats(),weights=order.weights;let weightedError=0,totalWeight=0;values.forEach((v,i)=>{weightedError+=Math.abs(v-order.target[i])*weights[i];totalWeight+=weights[i];});const match=clamp(Math.round(100-weightedError/(totalWeight*0.92)),0,100);const cost=partCost(),over=Math.max(0,cost-order.budget);const budgetPenalty=over?Math.min(32,Math.ceil(over*.42)):0;return {rating:clamp(match-budgetPenalty,0,100),match,cost,over,budget:order.budget};}
+function deliver(){const result=grade(),order=orderNow();if(result.cost>state.cash){showToast('A oficina ainda não tem caixa para essas peças.');return;}const rating=result.rating;const stars=rating>=92?5:rating>=78?4:rating>=61?3:rating>=43?2:1;const basePay=105+Math.round(rating*1.65);const savings=Math.max(0,order.budget-result.cost);const pay=basePay+Math.round(savings*.12);const net=pay-result.cost;state.cash+=net;state.rep+=stars;state.jobs++;state.day++;$('#result-stamp').textContent='★'.repeat(stars)+'☆'.repeat(5-stars);$('#result-title').textContent=stars>=4?'Feito pra tocar.':stars>=3?'Um bom começo.':'Hora de ajustar o ouvido.';const customerCopy=rating>=85?'O cliente abriu um sorriso antes mesmo da primeira música acabar.':rating>=65?'O cliente curtiu o som — e já tem uma ideia pra próxima versão.':'Nem todo protótipo vira hit. O cliente deu uma sugestão e você aprendeu com o teste.';$('#result-copy').textContent=`${customerCopy} ${order.name} ${stars>=4?'já recomendou a oficina pra alguém.':'agradeceu a entrega.'}`;$('#result-rating').textContent=`${rating}%`;$('#result-stars').textContent='★'.repeat(stars)+'☆'.repeat(5-stars);$('#result-receipt').innerHTML=`<span>PEÇAS − R$ ${result.cost}</span><span>VENDA + R$ ${pay}</span><span>CAIXA + R$ ${net}</span>`;$('#next-order').textContent=state.jobs%ORDERS.length===0?'NOVA ENCOMENDA ↗':'PRÓXIMA ENCOMENDA →';$('#result-modal').classList.remove('hidden');save();}
+function nextOrder(){customOrder=null;if(state.jobs>0&&state.jobs%ORDERS.length===0){const names=['Marcos','Sol','Nina','Zeca','Téo','Rita'];const profiles=['Som pra viagem','Clássicos no vinil','Festa no quintal','Cinema em casa','Som sem frescura'];const targets=[[73,59,80],[43,86,48],[84,55,76],[58,82,69],[62,66,61]];const idx=Math.floor(Math.random()*targets.length);customOrder={name:names[Math.floor(Math.random()*names.length)],avatar:['✳','☼','♫','✿'][Math.floor(Math.random()*4)],profile:profiles[idx],quote:['Cada música tem que soar do jeito que foi gravada. Confio no seu ouvido!','Quero uma caixa honesta: bom som, boa companhia e nada de promessa milagrosa.','É pra todo mundo dançar. Se o grave chegar no quintal do vizinho, melhor ainda!'][Math.floor(Math.random()*3)],budget:250+Math.floor(Math.random()*111),target:targets[idx],weights:[1,1,1]};}state.order++;state.picks={woofer:1,tweeter:1,cabinet:0,crossover:1};$('#result-modal').classList.add('hidden');save();render();window.scrollTo({top:0,behavior:'smooth'});}
+let audioContext=null;function listen(){const stage=$('.speaker-stage');stage.classList.add('playing');setTimeout(()=>stage.classList.remove('playing'),1700);if(state.muted)return;try{audioContext=audioContext||new(window.AudioContext||window.webkitAudioContext)();if(audioContext.state==='suspended')audioContext.resume();const now=audioContext.currentTime;[110,165,220,330].forEach((freq,i)=>{const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.type=i<2?'sine':'triangle';osc.frequency.setValueAtTime(freq,now);gain.gain.setValueAtTime(0,now);gain.gain.linearRampToValueAtTime(i<2?.07:.025,now+.03);gain.gain.exponentialRampToValueAtTime(.001,now+.7+i*.16);osc.connect(gain);gain.connect(audioContext.destination);osc.start(now);osc.stop(now+.9+i*.16);});}catch{showToast('O teste visual está ligado — som indisponível neste navegador.');}}
+$('#start-game').addEventListener('click',startGame);$('#deliver-button').addEventListener('click',deliver);$('#next-order').addEventListener('click',nextOrder);$('#close-result').addEventListener('click',()=>$('#result-modal').classList.add('hidden'));$('#listen-button').addEventListener('click',listen);$('#sound-toggle').addEventListener('click',()=>{state.muted=!state.muted;save();render();showToast(state.muted?'Som desligado.':'Som ligado.');});$('#reset-game').addEventListener('click',()=>{if(confirm('Recomeçar do zero? Todo o progresso desta oficina será apagado.')){state={day:1,cash:500,rep:0,jobs:0,order:0,picks:{woofer:1,tweeter:1,cabinet:0,crossover:1},muted:false};customOrder=null;save();render();window.scrollTo({top:0,behavior:'smooth'});}});
+if(state.jobs>0){startGame();}else{render();}
