@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#83d8f6">
+  <link rel="icon" href="data:,">
+  <title>Super Hoops — Mushroom Kingdom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700;800;900&family=Nunito:wght@700;800;900;1000&display=swap" rel="stylesheet">
+  <style>
+    :root{font-family:'DM Sans',system-ui,sans-serif;color:#fff;--cream:#fff8df;--ink:#152b4a;--red:#f64b3c;--yellow:#ffc83d;--blue:#338be8;--safe-bottom:env(safe-area-inset-bottom,0px)}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#85dafa;touch-action:none}body{user-select:none;-webkit-user-select:none}button{font:inherit;color:inherit;cursor:pointer;border:0}
+    #game{position:relative;width:100%;height:100%;height:100dvh;overflow:hidden;background:linear-gradient(180deg,#73d5f4 0%,#c2f0ed 67%,#9ddbad 100%);isolation:isolate}#scene{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:none}
+    .sky-glow{position:absolute;z-index:1;pointer-events:none;inset:0;background:linear-gradient(180deg,rgba(197,244,255,.18),transparent 40%,rgba(19,63,61,.05));}
+    .hud{position:absolute;z-index:4;inset:0;pointer-events:none;padding:max(16px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) calc(18px + var(--safe-bottom)) max(18px,env(safe-area-inset-left));display:flex;flex-direction:column;justify-content:space-between}
+    .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;width:min(100%,1080px);margin:0 auto}.brand{display:flex;align-items:center;gap:10px;padding-top:4px}.brand-mark{width:44px;height:44px;border-radius:15px;background:var(--red);border:3px solid #fff;box-shadow:0 4px 0 #b93432,0 6px 12px #16456732;display:grid;place-items:center;transform:rotate(-5deg);font-size:27px}.brand-name{font-family:Nunito,sans-serif;font-weight:1000;font-size:clamp(17px,3vw,24px);letter-spacing:-.7px;color:#14375c;text-shadow:0 1px #fff9;line-height:1}.brand-sub{display:block;font:800 9px 'DM Sans',sans-serif;letter-spacing:2px;color:#27728b;margin-top:3px;text-transform:uppercase}
+    .stats{display:flex;gap:8px;align-items:flex-start}.stat{min-width:76px;text-align:center;padding:9px 13px 10px;background:#fff6e5ed;border:2px solid #fff;border-radius:16px;box-shadow:0 4px 0 #42728b35;color:var(--ink)}.stat.score{min-width:96px}.stat-label{font-size:9px;font-weight:900;letter-spacing:1.7px;color:#5a7990}.stat-value{font:1000 23px/1 Nunito,sans-serif;letter-spacing:-.6px;margin-top:3px}.stat.timer .stat-value{color:#e64a3b}.stat-value small{font-size:12px;color:#66829a}.stat.combo .stat-value{color:#eb9e18}
+    .game-message{position:absolute;left:50%;top:20%;transform:translateX(-50%);white-space:nowrap;color:#fff;font:1000 clamp(27px,6vw,48px)/1 Nunito,sans-serif;letter-spacing:-1.5px;text-shadow:0 3px 0 #d34e33,0 6px 10px #173a5155;opacity:0;transition:opacity .15s,transform .15s;pointer-events:none}.game-message.show{opacity:1;transform:translateX(-50%) translateY(-10px)}
+    .aim-hint{position:absolute;left:50%;bottom:clamp(140px,22vh,210px);transform:translateX(-50%);font-size:12px;font-weight:900;letter-spacing:.3px;color:#fff;text-shadow:0 2px 6px #173a51aa;white-space:nowrap;transition:opacity .4s}.aim-hint b{background:#fff4;color:#fff;border:1px solid #ffffff80;padding:5px 9px;border-radius:99px;margin-right:5px}
+    .bottom-ui{width:min(100%,1080px);margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}.aim-pad{pointer-events:auto;display:flex;gap:8px;align-items:center}.control-caption{display:block;color:white;text-shadow:0 1px 5px #214962aa;font-weight:900;font-size:9px;letter-spacing:1.7px;margin:0 0 7px 3px}.aim-btn{width:54px;height:51px;border-radius:17px;background:#fff1dcf2;color:#1b3d5d;border:2px solid #fff;box-shadow:0 4px 0 #52758a69;display:grid;place-items:center;font-size:23px;font-weight:1000;pointer-events:auto;touch-action:manipulation;transition:transform .1s,box-shadow .1s}.aim-btn:active,.shoot-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #52758a69}
+    .shoot-btn{pointer-events:auto;min-width:clamp(178px,31vw,260px);height:64px;border-radius:23px;background:linear-gradient(180deg,#ffdf5b,#ffb92c);color:#773a16;border:3px solid #fff;box-shadow:0 5px 0 #cd7924,0 8px 18px #204a5155;display:flex;align-items:center;justify-content:center;gap:11px;touch-action:none;transition:transform .1s,filter .1s;position:relative;overflow:hidden}.shoot-btn .ball-icon{font-size:28px;filter:drop-shadow(0 2px 0 #9c5915)}.shoot-btn .button-copy{text-align:left;font:1000 14px/1.05 Nunito,sans-serif;letter-spacing:.2px}.shoot-btn .button-copy small{display:block;font:900 9px 'DM Sans',sans-serif;letter-spacing:1.2px;margin-top:4px;opacity:.72}.charge-fill{position:absolute;left:0;bottom:0;height:6px;width:0;background:#f05b3e;transition:width .06s linear}.shoot-btn.charging .charge-fill{width:var(--charge,0%)}
+    .sound-btn{pointer-events:auto;width:43px;height:43px;border:2px solid #ffffffbb;border-radius:15px;background:#fff3;color:#fff;font-size:19px;display:grid;place-items:center;align-self:flex-end;margin-bottom:4px;touch-action:manipulation}
+    .overlay{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:20px;background:#17354b35;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);transition:opacity .24s}.overlay.hidden{opacity:0;pointer-events:none}.panel{width:min(440px,100%);padding:30px 32px 27px;background:var(--cream);border:4px solid white;border-radius:30px;color:var(--ink);box-shadow:0 9px 0 #cfb981,0 20px 50px #18394a52;text-align:center;position:relative;overflow:hidden}.panel:before{content:'';position:absolute;inset:0 0 auto;height:9px;background:linear-gradient(90deg,#f24c42 0 33%,#ffc744 33% 66%,#4fa6eb 66%)}.panel-emoji{font-size:45px;line-height:1;margin:2px 0 9px;filter:drop-shadow(0 4px #edc97c)}.panel h1{font:1000 clamp(35px,8vw,48px)/.93 Nunito,sans-serif;letter-spacing:-2px;color:#ed493c;margin:0;text-shadow:0 2px #fff}.panel h1 span{display:block;color:#1e4771;font-size:.57em;letter-spacing:1px;margin-top:7px}.panel p{font-size:14px;line-height:1.55;font-weight:700;color:#5b7182;margin:17px auto 18px;max-width:330px}.howto{display:flex;justify-content:center;gap:9px;margin:17px 0 21px}.how-item{width:31%;padding:11px 6px 10px;background:#f0e9d4;border-radius:15px;font-size:10px;font-weight:900;color:#526b80;line-height:1.3}.how-item b{display:block;font-size:20px;margin-bottom:5px}.start-btn{width:100%;height:59px;background:linear-gradient(180deg,#ff6854,#ed433b);border:3px solid #fff;border-radius:18px;box-shadow:0 5px 0 #b82f34;color:white;font:1000 17px Nunito,sans-serif;letter-spacing:.4px;text-shadow:0 1px #a4282a;touch-action:manipulation}.start-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #b82f34}.footnote{font-size:10px;font-weight:800;letter-spacing:.8px;color:#91a0a4;margin-top:16px;text-transform:uppercase}
+    .round-result{font:1000 48px/1 Nunito,sans-serif;color:#ed493c;margin:16px 0 3px}.result-label{font-size:10px;font-weight:900;letter-spacing:2px;color:#668095}
+    @media(max-width:600px){.hud{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right));padding-bottom:calc(14px + var(--safe-bottom))}.topbar{align-items:flex-start}.brand{gap:7px}.brand-mark{width:38px;height:38px;border-radius:13px;font-size:23px}.brand-name{font-size:17px}.brand-sub{font-size:8px;letter-spacing:1.5px}.stats{gap:5px}.stat{min-width:58px;padding:8px 8px;border-radius:13px}.stat.score{min-width:69px}.stat-label{font-size:8px;letter-spacing:1px}.stat-value{font-size:20px}.bottom-ui{gap:7px}.aim-btn{width:46px;height:48px;border-radius:15px}.shoot-btn{min-width:156px;height:58px;border-radius:20px;gap:8px}.shoot-btn .button-copy{font-size:13px}.shoot-btn .ball-icon{font-size:24px}.sound-btn{width:39px;height:39px}.aim-hint{bottom:clamp(116px,17vh,155px);font-size:10px}.panel{padding:27px 22px 23px;border-radius:26px}.game-message{top:18%}}
+    @media(max-height:500px) and (orientation:landscape){.hud{padding-top:max(8px,env(safe-area-inset-top));padding-bottom:calc(8px + var(--safe-bottom))}.stat{padding:6px 10px}.stat-value{font-size:18px}.brand-mark{width:34px;height:34px}.aim-btn{height:42px;width:46px}.shoot-btn{height:49px}.aim-hint{bottom:80px}.panel{padding:19px 24px}.panel-emoji{font-size:30px;margin:0}.panel p{margin:10px auto}.howto{margin:10px 0}.footnote{margin-top:9px}}
+    @media(min-width:800px){.bottom-ui{padding:0 10px}.topbar{padding:0 10px}}
+  </style>
+</head>
+<body>
+  <main id="game" aria-label="Super Hoops basquete 3D">
+    <canvas id="scene" aria-label="Quadra 3D: arraste para mirar e arremessar"></canvas><div class="sky-glow"></div>
+    <div class="hud">
+      <header class="topbar">
+        <div class="brand"><div class="brand-mark">🏀</div><div class="brand-name">SUPER HOOPS<span class="brand-sub">MUSHROOM KINGDOM</span></div></div>
+        <div class="stats">
+          <div class="stat score"><div class="stat-label">PONTOS</div><div class="stat-value" id="score">000</div></div>
+          <div class="stat timer"><div class="stat-label">TEMPO</div><div class="stat-value" id="timer">60<small>s</small></div></div>
+          <div class="stat combo"><div class="stat-label">SEGUIDAS</div><div class="stat-value" id="combo">×0</div></div>
+        </div>
+      </header>
+      <div class="game-message" id="message">CESTAAA! ✨</div>
+      <div class="aim-hint" id="aimHint"><b>↔</b> ARRASTE PARA MIRAR</div>
+      <footer class="bottom-ui">
+        <div><span class="control-caption">MIRAR</span><div class="aim-pad"><button class="aim-btn" id="leftBtn" aria-label="Mirar para esquerda">←</button><button class="aim-btn" id="rightBtn" aria-label="Mirar para direita">→</button></div></div>
+        <button class="shoot-btn" id="shootBtn" aria-label="Segure para arremessar"><span class="ball-icon">🏀</span><span class="button-copy">ARREMESSAR<small>TOQUE OU SEGURE</small></span><i class="charge-fill"></i></button>
+        <button class="sound-btn" id="soundBtn" aria-label="Ativar ou desativar som">♫</button>
+      </footer>
+    </div>
+    <section class="overlay" id="overlay">
+      <div class="panel" id="panel">
+        <div class="panel-emoji" id="panelEmoji">🍄 🏀 ⭐</div>
+        <h1 id="panelTitle">SUPER<span>HOOPS!</span></h1>
+        <p id="panelText">A torcida do Reino Cogumelo está esperando! Faça cestas incríveis antes que o tempo acabe.</p>
+        <div class="howto" id="howto"><div class="how-item"><b>👆</b>Arraste para<br>mirar</div><div class="how-item"><b>🏀</b>Segure para<br>ganhar força</div><div class="how-item"><b>⭐</b>Faça cestas<br>em sequência</div></div>
+        <button class="start-btn" id="startBtn">JOGAR AGORA&nbsp; ▶</button>
+        <div class="footnote" id="footnote">60 SEGUNDOS · DIVERSÃO INFINITA</div>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="./game.js"></script>
+</body>
+</html>
