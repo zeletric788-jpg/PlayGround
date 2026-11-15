@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#101915">
+  <title>FRONTIER: Mundos de Cristal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="game-shell">
+    <canvas id="world" aria-label="Mundo 3D de FRONTIER"></canvas>
+    <div class="vignette"></div>
+    <header class="topbar" id="topbar">
+      <a class="brand" href="#" aria-label="Frontier"><span class="brand-mark">✦</span><span>FRONTIER<small>MUNDOS DE CRISTAL</small></span></a>
+      <div class="quest-card"><span class="quest-kicker"><i></i> JORNADA · 01</span><b id="quest-title">O chamado da fronteira</b><span id="quest-subtitle">Encontre o santuário além da floresta.</span><div class="quest-progress"><i id="quest-progress"></i></div></div>
+      <div class="player-chip"><span class="level-icon">16</span><span><b>Viajante</b><small>IDADE · 16</small></span></div>
+    </header>
+    <div class="world-label" id="world-label"><span>VALE DE AUREL</span><i></i> TERRAS DE FRONTEIRA</div>
+    <div class="hud-bottom" id="hud-bottom">
+      <div class="vitals"><div class="vital-top"><span>VIGOR</span><b id="health-text">100</b></div><div class="vital-track"><i id="health-bar"></i></div><div class="vital-bottom"><span>✦</span><span id="power-label">SEM DESPERTAR</span></div></div>
+      <div class="controls-hint"><span class="key">W A S D</span> MOVER <span class="sep">·</span><span class="key">ESPAÇO</span> ESQUIVAR <span class="sep">·</span><span class="key">E</span> INTERAGIR <span class="sep">·</span><span class="key">F</span> GOLPE</div>
+      <div class="crystal-count"><span class="crystal-mini">◇</span><span><b id="crystal-count">0</b><small>CRISTAL</small></span></div>
+    </div>
+    <div class="interaction" id="interaction"><span class="key">E</span><span id="interaction-text">Interagir</span></div>
+    <div class="combat-toast" id="combat-toast"></div>
+    <div class="damage-flash" id="damage-flash"></div>
+    <div class="center-reticle" id="reticle"></div>
+    <div class="screen" id="intro-screen">
+      <div class="intro-content">
+        <div class="intro-eyebrow"><span></span> UMA AVENTURA DE FRONTEIRA <span></span></div>
+        <h1>FRONTIER</h1><p class="intro-subtitle">MUNDOS DE CRISTAL</p>
+        <p class="intro-copy">Aos dezesseis anos, todo caminho leva ao desconhecido.<br>O que você encontra lá dentro depende de quem você é.</p>
+        <button class="primary-button" id="start-button"><span>INICIAR JORNADA</span><b>↗</b></button>
+        <div class="intro-foot"><span>WASD · MOVIMENTO</span><i></i><span>ESPAÇO · ESQUIVA</span><i></i><span>F · GOLPE</span></div>
+      </div>
+      <div class="intro-bottom"><span>UM MUNDO MOLDADO POR AMBIÇÃO</span><span>01 — VALE DE AUREL</span></div>
+    </div>
+    <div class="screen hidden" id="story-screen"><div class="story-panel"><div class="story-icon">◇</div><span class="story-kicker" id="story-kicker">O CRISTAL ESCOLHEU VOCÊ</span><h2 id="story-title">O que move você?</h2><p id="story-copy">Um cristal pode surgir para qualquer pessoa. Mas possuir um não é o mesmo que despertar seu poder. Para isso, é preciso encarar o verdadeiro sentido da sua ambição.</p><div class="choice-list" id="choice-list"></div><button class="quiet-button hidden" id="continue-button">CONTINUAR A JORNADA <span>→</span></button></div></div>
+    <div class="screen hidden" id="fail-screen"><div class="story-panel"><div class="story-icon">✧</div><span class="story-kicker">O DESAFIO NÃO TERMINOU VOCÊ</span><h2>Ainda há um caminho.</h2><p>A prova falhou, mas a energia desconhecida não mede seu valor. Seu cristal ainda pode se manifestar. Respire fundo e volte à clareira.</p><button class="primary-button" id="return-button"><span>VOLTAR À CLAREIRA</span><b>↗</b></button></div></div>
+    <div class="mobile-controls" id="mobile-controls"><div class="dpad"><button data-move="forward">▲</button><div><button data-move="left">◀</button><button data-move="back">▼</button><button data-move="right">▶</button></div></div><div class="mobile-actions"><button id="mobile-dodge">ESQUIVA</button><button id="mobile-attack">GOLPE</button><button id="mobile-interact">USAR</button></div></div>
+    <div class="toast" id="toast"></div>
+  </main>
+  <script type="module" src="game.js"></script>
+</body>
+</html>
