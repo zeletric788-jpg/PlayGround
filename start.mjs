@@ -2,7 +2,10 @@ import { createReadStream, existsSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, join, normalize } from 'node:path';
 
-const port = Number(process.env.PORT || 3000);
+const portFlag = process.argv.findIndex((arg) => arg === '--port');
+const portValue = portFlag >= 0 ? process.argv[portFlag + 1] : process.argv.find((arg) => arg.startsWith('--port='))?.slice(7);
+const port = Number(portValue || process.env.PORT || 3000);
+if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error(`Invalid port: ${portValue}`);
 const root = process.cwd();
 const types = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json' };
 createServer((request, response) => {
